@@ -1,0 +1,32 @@
+from datetime import datetime
+
+from sqlalchemy.orm import relationship
+
+from database.database import Base
+from sqlalchemy import Column, Integer, String, Boolean, DateTime, Enum, ForeignKey
+import enum
+
+class DeliveryMethod(enum.Enum):
+    COURIER = "COURIER"
+    SELFPICKUP = "SELFPICKUP"
+
+class Order(Base):
+    __tablename__ = "orders"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, default="Task")
+    description = Column(String, nullable=True)
+    date_of_creation = Column(DateTime, default=datetime.utcnow)
+    date_of_send = Column(DateTime, nullable=True)
+    address = Column(String, nullable=True)
+    delivery_method = Column(Enum(DeliveryMethod), default=DeliveryMethod.COURIER)
+    client_id = Column(Integer, ForeignKey("clients.id"))
+    price = Column(Integer, default=0)
+    author_id = Column(Integer, ForeignKey("users.id"))
+    responsable_id = Column(Integer, ForeignKey("users.id"))
+
+
+    client = relationship("Client", back_populates="orders")
+    author = relationship("User", foreign_keys=[author_id])
+    responsable = relationship("User", foreign_keys=[responsable_id])
+
