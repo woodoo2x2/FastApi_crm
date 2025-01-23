@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     DATABASE_PASSWORD: str = os.getenv('DATABASE_PASSWORD')
     DATABASE_PORT: str = os.getenv('DATABASE_PORT')
 
+    SESSION_SECRET_KEY: str = os.getenv('SESSION_SECRET_KEY')
     @property
     def db_path(self):
         return f"postgresql+asyncpg://{self.DATABASE_USER}:{self.DATABASE_PASSWORD}@{self.DATABASE_HOST}:{self.DATABASE_PORT}/{self.DATABASE_NAME}"

@@ -26,11 +26,8 @@ async def get_order(order_id: int,
     return await order_logic.get_order_by_id(order_id)
 
 
-
-
-
 @router.delete('/{order_id}')
-async def delete_order(order_id:int,
+async def delete_order(order_id: int,
                        order_logic: OrderLogic = Depends(get_orders_logic)):
     try:
         await order_logic.delete_order(order_id)
