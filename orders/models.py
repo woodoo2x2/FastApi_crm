@@ -1,14 +1,16 @@
+import enum
 from datetime import datetime
 
+from sqlalchemy import Column, Integer, String, DateTime, Enum, ForeignKey
 from sqlalchemy.orm import relationship
 
-from database.database import Base
-from sqlalchemy import Column, Integer, String, Boolean, DateTime, Enum, ForeignKey
-import enum
+from database.base import Base  # Убедитесь, что импортируется из правильного места
+
 
 class DeliveryMethod(enum.Enum):
     COURIER = "COURIER"
     SELFPICKUP = "SELFPICKUP"
+
 
 class Order(Base):
     __tablename__ = "orders"
@@ -20,13 +22,11 @@ class Order(Base):
     date_of_send = Column(DateTime, nullable=True)
     address = Column(String, nullable=True)
     delivery_method = Column(Enum(DeliveryMethod), default=DeliveryMethod.COURIER)
-    client_id = Column(Integer, ForeignKey("clients.id"))
+    client_id = Column(Integer, ForeignKey("clients.id"), nullable=True)
     price = Column(Integer, default=0)
     author_id = Column(Integer, ForeignKey("users.id"))
     responsable_id = Column(Integer, ForeignKey("users.id"))
 
-
     client = relationship("Client", back_populates="orders")
     author = relationship("User", foreign_keys=[author_id])
     responsable = relationship("User", foreign_keys=[responsable_id])
-

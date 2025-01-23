@@ -1,9 +1,10 @@
 import enum
 from datetime import datetime
 
-from sqlalchemy import Column, Integer, String, Boolean, DateTime, Enum
 from passlib.context import CryptContext
-from database.database import Base
+from sqlalchemy import Column, Integer, String, Boolean, DateTime, Enum
+
+from database.base import Base
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -25,4 +26,3 @@ class User(Base):
     is_admin = Column(Boolean, default=False)
 
     status = Column(Enum(UserStatus), default=UserStatus.PENDING, nullable=False)
-
