@@ -40,7 +40,7 @@ class OrderLogic:
             result = await session.execute(query)
             return result.scalars().all()
 
-    async def get_order_by_id(self, order_id: int):
+    async def get_client_by_id(self, order_id: int):
         async with self.db_session as session:
             query = select(Order).where(Order.id == order_id)
             result = await session.execute(query)
@@ -55,4 +55,5 @@ class OrderLogic:
                 user = await session.scalar(select(Order).where(Order.id == order_id))
                 await session.delete(user)
                 await session.commit()
+
 

@@ -35,4 +35,4 @@ async def delete_order(order_id:int,
     try:
         await order_logic.delete_order(order_id)
     except OrderNotFoundException as e:
-        HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=e.detail)
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=e.detail)
