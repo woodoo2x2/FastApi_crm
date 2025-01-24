@@ -12,3 +12,6 @@ class UserNotFoundException(Exception):
 
 class UserNotCorrectPasswordException(Exception):
     detail = 'Not correct password'
+
+class MailConfigError(Exception):
+    detail = 'Mail Config is invalid'

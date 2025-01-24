@@ -4,7 +4,7 @@ from datetime import datetime
 from sqlalchemy import Column, Integer, String, DateTime, Enum, ForeignKey
 from sqlalchemy.orm import relationship
 
-from database.base import Base  # Убедитесь, что импортируется из правильного места
+from infrastructure.database.base import Base  # Убедитесь, что импортируется из правильного места
 
 
 class DeliveryMethod(enum.Enum):

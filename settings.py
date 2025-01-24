@@ -14,6 +14,16 @@ class Settings(BaseSettings):
     DATABASE_PORT: str = os.getenv('DATABASE_PORT')
 
     SESSION_SECRET_KEY: str = os.getenv('SESSION_SECRET_KEY')
+
+    MAIL_USERNAME: str = os.getenv("MAIL_USERNAME")
+    MAIL_PASSWORD: str = os.getenv("MAIL_PASSWORD")
+    MAIL_FROM: str = os.getenv("MAIL_FROM")
+    MAIL_PORT: str = os.getenv("MAIL_PORT")
+    MAIL_SERVER: str = os.getenv("MAIL_SERVER")
+    MAIL_USE_TLS : bool = False
+    MAIL_SSL_TLS: bool = os.getenv("MAIL_SSL_TLS", "true").lower() in ("true", "1", "yes")
+    MAIL_USE_CREDENTIALS: bool = os.getenv("MAIL_USE_CREDENTIALS", "true").lower() in ("true", "1", "yes")
+    MAIL_SECRET_KEY : str = os.getenv('SECRET_KEY','secret1')
     @property
     def db_path(self):
         return f"postgresql+asyncpg://{self.DATABASE_USER}:{self.DATABASE_PASSWORD}@{self.DATABASE_HOST}:{self.DATABASE_PORT}/{self.DATABASE_NAME}"
