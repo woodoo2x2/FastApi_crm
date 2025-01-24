@@ -40,14 +40,14 @@ async def registration_post(
         background_tasks: BackgroundTasks = BackgroundTasks(),
         mail_service: MailService = Depends(get_mail_service)
 ):
-    logger.info(f"Попытка регистрации нового пользователя с email: {data.email}.")
     user = await user_logic.get_user_by_email(email=data.email)
     if user:
         logger.warning(f"Регистрация не удалась. Email {data.email} уже используется.")
         raise HTTPException(status_code=400, detail="Этот email уже используется.")
     new_user = await user_logic.create_user(
         UserCreateSchema(username=data.username, email=data.email, password=data.password))
-    logger.info(f"Пользователь {new_user.email} успешно зарегистрирован.")
     background_tasks.add_task(mail_service.send_confirmation_email, new_user)
     return {"message": f"user {new_user.email} created"}
+
+
 

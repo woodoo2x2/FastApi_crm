@@ -93,4 +93,5 @@ class MailService:
             email = serializer.loads(token, salt="email-confirm-salt", max_age=3600)
         except Exception as e:
             return None
-        return await self.user_logic.get_user_by_email(email)
+
+        return await self.user_logic.confirm_user_by_email(email)
