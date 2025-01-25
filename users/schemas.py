@@ -22,3 +22,6 @@ class UserUpdateSchema(BaseModel):
     surname: str | None = None
     phone_number: str | None = None
     email: str | None = None
+
+class ResetPasswordRequest(BaseModel):
+    password: str

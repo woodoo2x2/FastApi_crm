@@ -9,7 +9,7 @@ from exceptions import UserNotFoundException, UserNotCorrectPasswordException
 from infrastructure.mail.service import MailService
 from users.auth.service import AuthService
 from users.logic import UserLogic
-from users.schemas import UserLoginSchema, UserCreateSchema
+from users.schemas import UserLoginSchema, UserCreateSchema, ResetPasswordRequest
 
 router = APIRouter(prefix='/auth', tags=['auth'])
 
@@ -50,4 +50,36 @@ async def registration_post(
     return {"message": f"user {new_user.email} created"}
 
 
+@router.post("/recovery_password")
+async def recovery_password_post(
+        email: str,
+        background_tasks: BackgroundTasks = BackgroundTasks(),
+        mail_service: MailService = Depends(get_mail_service),
+        user_logic: UserLogic = Depends(get_user_logic),
+):
+    logger.info(f"Попытка восстановления пароля для email: {email}.")
+    user = await user_logic.get_user_by_email(email=email)
+    if user:
+        logger.info(f"Письмо для восстановления пароля отправлено на {email}.")
+        background_tasks.add_task(mail_service.send_reset_password_email, user)
+        return {"message": f"Письмо для восстановления пароля отправлено на {email}"}
+    logger.warning(f"Восстановление пароля не удалось. Пользователь с email {email} не найден.")
+    raise HTTPException(status_code=400, detail="Пользователь с таким email не найден.")
 
+
+# POSTMAN content/type - application/json / body  {password: "password"}
+@router.post("/reset_password/{token}")
+async def reset_password_post(
+        token: str,
+        request: ResetPasswordRequest,
+        mail_service: MailService = Depends(get_mail_service),
+        user_logic: UserLogic = Depends(get_user_logic),
+):
+    logger.info("Обработка POST-запроса на смену пароля.")
+    user = await mail_service.verify_reset_password_token(token)
+    if not user:
+        logger.error("Токен восстановления пароля неверный или просрочен.")
+        raise HTTPException(status_code=400, detail="Неверный или просроченный токен.")
+    await user_logic.change_user_password(user_id=user.id, password=request.password)
+    logger.info(f"Пароль пользователя {user.email} успешно изменён.")
+    return {'message': f'Пароль пользователя {user.email} успешно изменён.'}

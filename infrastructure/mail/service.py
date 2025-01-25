@@ -4,6 +4,7 @@ from fastapi import HTTPException
 from fastapi_mail import MessageSchema, FastMail
 from itsdangerous import URLSafeTimedSerializer
 
+from exceptions import MailNotSendedException
 from infrastructure.mail.config import mail_config
 from settings import Settings
 from users.logic import UserLogic
@@ -15,21 +16,14 @@ class MailService:
     settings: Settings
     user_logic: UserLogic
 
-    def get_email_confirmation_token(self, email: str) -> str:
-        serializer = URLSafeTimedSerializer(self.settings.MAIL_SECRET_KEY)
-        token = serializer.dumps(email, salt="email-confirm-salt")
-        return token
-
     async def send_confirmation_email(self, user: User):
         try:
-            token = self.get_email_confirmation_token(email=user.email)
-            confirmation_link = f"http://127.0.0.1:8000/auth/confirm/{token}"
+
             subject = "Подтверждение учетной записи"
             body = (
                 f"Здравствуйте, {user.username}!\n\n"
-                f"Для подтверждения вашей учетной записи перейдите по ссылке ниже:\n"
-                f"{confirmation_link}\n\n"
-                f"Спасибо!"
+                f"Ожидайте подтверждение вашей учетной записи администратором"
+
             )
             message = MessageSchema(
                 subject=subject,
@@ -40,13 +34,12 @@ class MailService:
 
             fm = FastMail(mail_config)
             await fm.send_message(message)
-        except Exception as e:
-            raise HTTPException(status_code=500, detail="Не удалось отправить письмо.")
+        except MailNotSendedException as e:
+            raise HTTPException(status_code=500, detail=e.detail)
 
     def get_reset_password_token(self, email: str) -> str:
         serializer = URLSafeTimedSerializer(self.settings.MAIL_SECRET_KEY)
         token = serializer.dumps(email, salt="password-reset-salt")
-
         return token
 
     async def verify_reset_password_token(self, token: str) -> User | None:
