@@ -10,6 +10,10 @@ class UserNotFoundException(Exception):
     detail = 'User not found'
 
 
+class UserNotConfirmedByAdminException(Exception):
+    detail = 'User not confirmed by email. Wait until administrator confirms your account'
+
+
 class UserNotCorrectPasswordException(Exception):
     detail = 'Not correct password'
 

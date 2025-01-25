@@ -14,7 +14,8 @@ class UserStatus(enum.Enum):
     PENDING = "PENDING"
     BLOCKED = "BLOCKED"
 
-
+    def __str__(self):
+        return self.value
 class User(Base):
     __tablename__ = "users"
 

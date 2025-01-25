@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
 from starlette import status
 
 from dependency import get_auth_service, get_user_logic, get_mail_service
-from exceptions import UserNotFoundException, UserNotCorrectPasswordException
+from exceptions import UserNotFoundException, UserNotCorrectPasswordException,    UserNotConfirmedByAdminException
 from infrastructure.mail.service import MailService
 from users.auth.service import AuthService
 from users.logic import UserLogic
@@ -22,12 +22,14 @@ async def login_post(
 ):
     try:
         data = await auth_service.login(email=data.email, password=data.password)
+        logger.info(f"Login successful")
         return data
     except UserNotFoundException as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=e.detail)
     except UserNotCorrectPasswordException as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=e.detail)
-
+    except UserNotConfirmedByAdminException as e:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=e.detail)
 
 @router.post("/registration")
 async def registration_post(
