@@ -3,7 +3,7 @@ import os
 from dotenv import load_dotenv
 from pydantic_settings import BaseSettings
 
-load_dotenv("./.env")
+load_dotenv(".env")
 
 
 class Settings(BaseSettings):
@@ -20,10 +20,14 @@ class Settings(BaseSettings):
     MAIL_FROM: str = os.getenv("MAIL_FROM")
     MAIL_PORT: str = os.getenv("MAIL_PORT")
     MAIL_SERVER: str = os.getenv("MAIL_SERVER")
-    MAIL_USE_TLS : bool = False
+    MAIL_USE_TLS: bool = False
     MAIL_SSL_TLS: bool = os.getenv("MAIL_SSL_TLS", "true").lower() in ("true", "1", "yes")
     MAIL_USE_CREDENTIALS: bool = os.getenv("MAIL_USE_CREDENTIALS", "true").lower() in ("true", "1", "yes")
-    MAIL_SECRET_KEY : str = os.getenv('SECRET_KEY','secret1')
+    MAIL_SECRET_KEY: str = os.getenv('SECRET_KEY', 'secret1')
+
+    JWT_SECRET_KEY: str = os.getenv('JWT_SECRET_KEY')
+    JWT_DECODE_ALGORITHM: str = os.getenv('JWT_DECODE_ALGORITHM')
+
     @property
     def db_path(self):
         return f"postgresql+asyncpg://{self.DATABASE_USER}:{self.DATABASE_PASSWORD}@{self.DATABASE_HOST}:{self.DATABASE_PORT}/{self.DATABASE_NAME}"

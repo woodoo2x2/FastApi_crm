@@ -20,3 +20,11 @@ class MailConfigError(Exception):
 
 class MailNotSendedException(Exception):
     detail = 'Mail not sended'
+
+
+class TokenNotCorrectException(Exception):
+    detail = 'Token not correct'
+
+
+class TokenExpiredException(Exception):
+    detail = 'Token Expired'

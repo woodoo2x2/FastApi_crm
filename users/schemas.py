@@ -11,6 +11,11 @@ class UserAuthSchema(BaseModel):
     email: str
 
 
+class UserAuthenticatedSchema(BaseModel):
+    user_id: int
+    access_token: str
+
+
 class UserCreateSchema(BaseModel):
     username: str
     email: str
@@ -22,6 +27,7 @@ class UserUpdateSchema(BaseModel):
     surname: str | None = None
     phone_number: str | None = None
     email: str | None = None
+
 
 class ResetPasswordRequest(BaseModel):
     password: str

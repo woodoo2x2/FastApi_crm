@@ -1,7 +1,9 @@
-from fastapi import Depends
+from fastapi import Depends, security, Security, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
+from starlette import status
 
 from clients.logic import ClientLogic
+from exceptions import TokenExpiredException, TokenNotCorrectException
 from infrastructure.database.config import get_db_session
 from infrastructure.mail.service import MailService
 from orders.logic import OrderLogic
@@ -31,5 +33,21 @@ def get_mail_service(settings: Settings = Depends(get_settings),
     return MailService(settings=settings, user_logic=user_logic)
 
 
-def get_auth_service(user_logic: UserLogic = Depends(get_user_logic)):
-    return AuthService(user_logic=user_logic)
+def get_auth_service(user_logic: UserLogic = Depends(get_user_logic),
+                     settings: Settings = Depends(get_settings)):
+    return AuthService(user_logic=user_logic, settings=settings)
+
+
+reusable_oauth2 = security.HTTPBearer()
+
+
+def get_request_user_id(auth_service: AuthService = Depends(get_auth_service),
+                        token: security.http.HTTPAuthorizationCredentials = Security(reusable_oauth2),
+                        ) -> int | None:
+    try:
+        user_id = auth_service.get_user_id_from_token(token.credentials)
+    except TokenExpiredException as e:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=e.detail)
+    except TokenNotCorrectException as e:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=e.detail)
+    return user_id

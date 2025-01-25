@@ -14,7 +14,7 @@ from orders.schemas import OrderCreateSchema
 class OrderLogic:
     db_session: AsyncSession
 
-    async def create_order(self, data: OrderCreateSchema) -> Order:
+    async def create_order(self, data: OrderCreateSchema, user_id: int) -> Order:
         async with self.db_session as session:
             order = Order(
                 name=data.name,
@@ -23,11 +23,11 @@ class OrderLogic:
                 date_of_send=datetime.datetime.utcnow() + datetime.timedelta(days=2),
                 address=data.address,
                 delivery_method=data.delivery_method,
-                client_id=data.client_id,
+                client_id=1,
                 price=data.price,
 
-                author_id=1,
-                responsable_id=1,
+                author_id=user_id,
+                responsable_id=user_id,
             )
 
             session.add(order)
