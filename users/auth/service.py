@@ -1,6 +1,7 @@
 import logging
 from dataclasses import dataclass
 from datetime import datetime, timedelta
+from typing import Tuple
 
 from jose import jwt
 
@@ -29,10 +30,9 @@ class AuthService:
             logger.error("Пользователь не найден")
         self._validate_user(user, password)
         logger.info("Пароль успешно проверен")
-        access_token = self.generate_access_token(user.id, user.status, user.is_admin)
+        access_token = self.generate_access_token(user.id, user.is_admin)
         logger.info(f"Токен доступа создан: {access_token}")
         return UserAuthenticatedSchema(user_id=user.id, access_token=access_token)
-
 
     @staticmethod
     def _validate_user(user: User, password: str):
@@ -64,3 +64,10 @@ class AuthService:
         if payload['expire'] > (datetime.utcnow() + timedelta(days=7)).timestamp():
             raise TokenExpiredException
         return payload['user_id']
+
+    def user_is_admin_and_user_id_from_token(self, token: str) -> Tuple[bool, int]:
+        payload = jwt.decode(token, self.settings.JWT_SECRET_KEY, algorithms=[self.settings.JWT_DECODE_ALGORITHM])
+
+        if payload.get('expire', 0) < datetime.utcnow().timestamp():
+            raise TokenExpiredException("Token has expired")
+        return payload.get('is_admin', False), payload.get('user_id')

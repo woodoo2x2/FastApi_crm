@@ -1,10 +1,11 @@
 from dataclasses import dataclass
 
+from sqlalchemy import select, insert
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from users.auth.utils import pwd_context
 from users.models import User
 from users.schemas import UserCreateSchema, UserUpdateSchema
-from sqlalchemy import select, insert
-from sqlalchemy.ext.asyncio import AsyncSession
 
 
 @dataclass
