@@ -12,17 +12,17 @@ class AdminLogic:
     db_session: AsyncSession
     user_logic : UserLogic
 
-    async def block_user_by_user_id(self, user_id:int):
+    async def change_user_status(self, user_id:int, status: UserStatus):
         user = await self.user_logic.get_user_by_id(user_id)
 
         if not user:
             raise UserNotFoundException
 
 
-        user.status = UserStatus.BLOCKED
+        user.status = status
         async with self.db_session as session:
             session.add(user)
             await session.commit()
 
 
-        return {"message": f"User {user_id} successfully blocked"}
+        return {"message": f"User {user_id} status successfully changed to {str(status)}"}
