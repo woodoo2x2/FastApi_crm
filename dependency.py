@@ -1,9 +1,9 @@
-from typing import Tuple
-
 from fastapi import Depends, security, Security, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
+from admin.logic import AdminLogic
+from admin.service import AdminService
 from clients.logic import ClientLogic
 from exceptions import TokenExpiredException, TokenNotCorrectException
 from infrastructure.database.config import get_db_session
@@ -55,3 +55,10 @@ def get_request_user_id(auth_service: AuthService = Depends(get_auth_service),
     return user_id
 
 
+def get_admin_service(auth_service: AuthService = Depends(get_auth_service)):
+    return AdminService(auth_service)
+
+
+def get_admin_logic(db_session: AsyncSession = Depends(get_db_session),
+                    user_logic: UserLogic = Depends(get_user_logic)):
+    return AdminLogic(db_session=db_session, user_logic=user_logic)

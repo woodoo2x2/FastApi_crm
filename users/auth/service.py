@@ -65,7 +65,7 @@ class AuthService:
             raise TokenExpiredException
         return payload['user_id']
 
-    def user_is_admin_(self, request: Request) -> None:
+    def user_is_admin(self, request: Request) -> None:
         try:
 
             access_token = request.session.get("access_token")
