@@ -4,11 +4,11 @@ from starlette import status
 
 from admin.logic import AdminLogic
 from admin.service import AdminService
-from clients.logic import ClientLogic
+from crm.clients.logic import ClientLogic
 from exceptions import TokenExpiredException, TokenNotCorrectException
 from infrastructure.database.config import get_db_session
 from infrastructure.mail.service import MailService
-from orders.logic import OrderLogic
+from crm.orders.logic import OrderLogic
 from settings import Settings
 from users.auth.service import AuthService
 from users.logic import UserLogic

@@ -9,6 +9,7 @@ from users.models import UserStatus
 
 @dataclass
 class AdminLogic:
+
     db_session: AsyncSession
     user_logic : UserLogic
 

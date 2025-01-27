@@ -4,8 +4,8 @@ from typing import Sequence
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from clients.models import Client
-from clients.schemas import ClientCreateSchema
+from crm.clients.models import Client
+from crm.clients.schemas import ClientCreateSchema
 from exceptions import ClientNotFoundException
 
 

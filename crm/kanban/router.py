@@ -1,36 +1,80 @@
+import json
+from typing import List
+
 from fastapi import APIRouter, Depends, HTTPException
 from starlette import status
+from starlette.websockets import WebSocketDisconnect, WebSocket
 
 from dependency import get_orders_logic, get_request_user_id
 from exceptions import OrderNotFoundException
-from orders.logic import OrderLogic
-from orders.schemas import OrderCreateSchema
+from crm.orders.logic import OrderLogic
+from crm.orders.schemas import OrderCreateSchema
 
 router = APIRouter(prefix='/kanban', tags=['kanban'])
 
+class WebSocketManager:
+    def __init__(self):
+        self.active_connections: List[WebSocket] = []
 
-@router.post('/')
-async def create_order(data: OrderCreateSchema,
-                       order_logic: OrderLogic = Depends(get_orders_logic),
-                       user_id: int = Depends(get_request_user_id)):
-    return await order_logic.create_order(data,user_id)
+    async def connect(self, websocket: WebSocket):
+        await websocket.accept()
+        self.active_connections.append(websocket)
 
+    def disconnect(self, websocket: WebSocket):
+        self.active_connections.remove(websocket)
 
-@router.get('/')
-async def get_all_orders(order_logic: OrderLogic = Depends(get_orders_logic)):
-    return await order_logic.get_all_orders()
-
-
-@router.get('/{order_id}')
-async def get_order(order_id: int,
-                    order_logic: OrderLogic = Depends(get_orders_logic)):
-    return await order_logic.get_order_by_id(order_id)
+    async def broadcast(self, message: str):
+        for connection in self.active_connections:
+            await connection.send_text(message)
 
 
-@router.delete('/{order_id}')
-async def delete_order(order_id: int,
-                       order_logic: OrderLogic = Depends(get_orders_logic)):
+manager = WebSocketManager()
+
+@router.websocket("/ws/orders")
+async def websocket_orders_endpoint(websocket: WebSocket,
+                                    order_logic: OrderLogic = Depends(get_orders_logic)):
+    await manager.connect(websocket)
     try:
-        await order_logic.delete_order(order_id)
-    except OrderNotFoundException as e:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=e.detail)
+        while True:
+            # Получаем сообщение от клиента
+            data = await websocket.receive_text()
+            request = json.loads(data)
+
+            action = request.get("action")
+            response = {}
+
+            if action == "create_order":
+                # Создание заказа
+                order_data = OrderCreateSchema(**request.get("data"))
+                user_id = request.get("user_id", 0)  # Получите user_id из сообщения
+                order = await order_logic.create_order(order_data, user_id)
+                response = {"action": "order_created", "order": order}
+
+            elif action == "get_all_orders":
+                # Получение всех заказов
+                orders = await order_logic.get_all_orders()
+                response = {"action": "all_orders", "orders": orders}
+
+            elif action == "get_order":
+                # Получение заказа по ID
+                order_id = request.get("order_id")
+                try:
+                    order = await order_logic.get_order_by_id(order_id)
+                    response = {"action": "order_details", "order": order}
+                except OrderNotFoundException:
+                    response = {"action": "error", "message": f"Order with ID {order_id} not found"}
+
+            elif action == "delete_order":
+                # Удаление заказа
+                order_id = request.get("order_id")
+                try:
+                    await order_logic.delete_order(order_id)
+                    response = {"action": "order_deleted", "order_id": order_id}
+                except OrderNotFoundException:
+                    response = {"action": "error", "message": f"Order with ID {order_id} not found"}
+
+            # Отправляем ответ клиенту
+            await manager.broadcast(json.dumps(response))
+
+    except WebSocketDisconnect:
+        manager.disconnect(websocket)

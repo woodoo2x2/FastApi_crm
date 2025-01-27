@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
 from starlette import status
 
-from clients.logic import ClientLogic
-from clients.schemas import ClientCreateSchema
+from crm.clients.logic import ClientLogic
+from crm.clients.schemas import ClientCreateSchema
 from dependency import get_client_logic
 from exceptions import ClientNotFoundException
 

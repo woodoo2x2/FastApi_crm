@@ -6,8 +6,8 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from exceptions import OrderNotFoundException
-from orders.models import Order
-from orders.schemas import OrderCreateSchema
+from crm.orders.models import Order
+from crm.orders.schemas import OrderCreateSchema
 
 
 @dataclass

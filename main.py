@@ -1,8 +1,11 @@
+from typing import List
+
 from fastapi import FastAPI
 from starlette.middleware.sessions import SessionMiddleware
+from starlette.websockets import WebSocket, WebSocketDisconnect
 
 from admin.router import router as admin_router
-from clients.router import router as client_router
+from crm.clients.router import router as client_router
 from settings import Settings
 from users.auth.router import router as auth_router
 
@@ -20,6 +23,3 @@ app.add_middleware(
 )
 
 
-@app.get('/')
-async def main():
-    return {"message": "homepage"}

@@ -1,8 +1,6 @@
-from sqlalchemy.orm import declarative_base
-
 from users.models import User
-from clients.models import Client
-from orders.models import Order
+from crm.clients.models import Client
+from crm.orders.models import Order
 
 
 

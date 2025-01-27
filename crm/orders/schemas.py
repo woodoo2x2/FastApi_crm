@@ -4,7 +4,7 @@ from datetime import datetime
 
 from pydantic import BaseModel, Field
 
-from orders.models import DeliveryMethod
+from crm.orders.models import DeliveryMethod
 
 
 class OrderCreateSchema(BaseModel):
