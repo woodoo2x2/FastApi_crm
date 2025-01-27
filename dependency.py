@@ -55,11 +55,3 @@ def get_request_user_id(auth_service: AuthService = Depends(get_auth_service),
     return user_id
 
 
-def get_is_admin_and_user_id(
-    auth_service: AuthService = Depends(get_auth_service),
-    token: security.http.HTTPAuthorizationCredentials = Security(reusable_oauth2)
-) -> Tuple[bool, int]:
-    try:
-        return auth_service.user_is_admin_and_user_id_from_token(token.credentials)
-    except (TokenExpiredException, TokenNotCorrectException) as e:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=e.detail)

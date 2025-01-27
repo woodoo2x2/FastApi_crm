@@ -32,3 +32,9 @@ class TokenNotCorrectException(Exception):
 
 class TokenExpiredException(Exception):
     detail = 'Token Expired'
+
+class AccessTokenNotFound(Exception):
+    detail = 'Access token missing or invalid'
+
+class UserNotAdminException(Exception):
+    detail = 'User have not permission'

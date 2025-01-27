@@ -1,10 +1,11 @@
 import logging
 
-from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
+from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks, Request
 from starlette import status
+from starlette.responses import JSONResponse
 
 from dependency import get_auth_service, get_user_logic, get_mail_service
-from exceptions import UserNotFoundException, UserNotCorrectPasswordException,    UserNotConfirmedByAdminException
+from exceptions import UserNotFoundException, UserNotCorrectPasswordException, UserNotConfirmedByAdminException
 from infrastructure.mail.service import MailService
 from users.auth.service import AuthService
 from users.logic import UserLogic
@@ -17,11 +18,13 @@ logger = logging.getLogger(__name__)
 
 @router.post("/login", name="login_post")
 async def login_post(
+        request: Request,
         data: UserLoginSchema,
         auth_service: AuthService = Depends(get_auth_service),
 ):
     try:
         data = await auth_service.login(email=data.email, password=data.password)
+        request.session["access_token"] = data.access_token
         logger.info(f"Login successful")
         return data
     except UserNotFoundException as e:
@@ -30,6 +33,7 @@ async def login_post(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=e.detail)
     except UserNotConfirmedByAdminException as e:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=e.detail)
+
 
 @router.post("/registration")
 async def registration_post(
@@ -81,3 +85,19 @@ async def reset_password_post(
     await user_logic.change_user_password(user_id=user.id, password=request.password)
     logger.info(f"Пароль пользователя {user.email} успешно изменён.")
     return {'message': f'Пароль пользователя {user.email} успешно изменён.'}
+
+
+@router.post("/logout", name="logout")
+async def logout(request: Request):
+    if "access_token" in request.session:
+        request.session.pop("access_token")
+        response = JSONResponse(
+            {"message": "Logout successful"},
+            status_code=200
+        )
+        response.delete_cookie("my_session")
+        return response
+    else:
+        return JSONResponse(
+            {"message": "No active session found"}, status_code=400
+        )

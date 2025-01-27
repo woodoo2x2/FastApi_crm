@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import List
 
 from sqlalchemy import select, insert
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -16,6 +17,11 @@ class UserLogic:
         query = select(User).where(User.email == email)
         async with self.db_session as session:
             result = (await session.execute(query)).scalar_one_or_none()
+            return result
+
+    async def get_all_users(self) -> List[User]:
+        async with self.db_session as session:
+            result = (await session.execute(select(User))).scalars().all()
             return result
 
     async def get_user_by_id(self, user_id: int) -> User | None:

@@ -28,6 +28,7 @@ class Settings(BaseSettings):
     JWT_SECRET_KEY: str = os.getenv('JWT_SECRET_KEY')
     JWT_DECODE_ALGORITHM: str = os.getenv('JWT_DECODE_ALGORITHM')
 
+
     @property
     def db_path(self):
         return f"postgresql+asyncpg://{self.DATABASE_USER}:{self.DATABASE_PASSWORD}@{self.DATABASE_HOST}:{self.DATABASE_PORT}/{self.DATABASE_NAME}"

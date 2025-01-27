@@ -1,12 +1,12 @@
 import logging
 from dataclasses import dataclass
 from datetime import datetime, timedelta
-from typing import Tuple
 
-from jose import jwt
+from jose import jwt, JWTError
+from starlette.requests import Request
 
 from exceptions import UserNotFoundException, UserNotCorrectPasswordException, TokenNotCorrectException, \
-    TokenExpiredException, UserNotConfirmedByAdminException
+    TokenExpiredException, UserNotConfirmedByAdminException, AccessTokenNotFound, UserNotAdminException
 from settings import Settings
 from users.auth.utils import pwd_context
 from users.logic import UserLogic
@@ -65,9 +65,25 @@ class AuthService:
             raise TokenExpiredException
         return payload['user_id']
 
-    def user_is_admin_and_user_id_from_token(self, token: str) -> Tuple[bool, int]:
-        payload = jwt.decode(token, self.settings.JWT_SECRET_KEY, algorithms=[self.settings.JWT_DECODE_ALGORITHM])
+    def user_is_admin_(self, request: Request) -> None:
+        try:
 
-        if payload.get('expire', 0) < datetime.utcnow().timestamp():
-            raise TokenExpiredException("Token has expired")
-        return payload.get('is_admin', False), payload.get('user_id')
+            access_token = request.session.get("access_token")
+            if not access_token:
+                logger.warning("Access token not found in session")
+                raise AccessTokenNotFound
+
+            payload = jwt.decode(access_token, self.settings.JWT_SECRET_KEY,
+                                 algorithms=[self.settings.JWT_DECODE_ALGORITHM])
+            is_admin_flag = payload.get("is_admin")
+
+            if is_admin_flag is None:
+                logger.warning("is_admin flag not found in token")
+                raise TokenNotCorrectException
+
+            if not is_admin_flag:
+                raise UserNotAdminException
+            return
+        except JWTError as e:
+            logger.error(f"JWT decoding error: {str(e)}")
+            raise TokenNotCorrectException
