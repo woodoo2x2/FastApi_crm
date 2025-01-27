@@ -11,7 +11,14 @@ class DeliveryMethod(enum.Enum):
     COURIER = "COURIER"
     SELFPICKUP = "SELFPICKUP"
 
+class OrderStatus(enum.Enum):
+    CREATED = "CREATED"
+    IN_PROGRESS = "IN_PROGRESS"
+    PAID = "PAID"
+    COMPLETED = "COMPLETED"
 
+    def __str__(self):
+        return self.value
 class Order(Base):
     __tablename__ = "orders"
 
@@ -26,6 +33,8 @@ class Order(Base):
     price = Column(Integer, default=0)
     author_id = Column(Integer, ForeignKey("users.id"))
     responsable_id = Column(Integer, ForeignKey("users.id"))
+
+    status = Column(Enum(OrderStatus), default=OrderStatus.CREATED)
 
     client = relationship("Client", back_populates="orders")
     author = relationship("User", foreign_keys=[author_id])
