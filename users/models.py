@@ -1,12 +1,12 @@
 import enum
 from datetime import datetime
 
-from passlib.context import CryptContext
+
 from sqlalchemy import Column, Integer, String, Boolean, DateTime, Enum
 
 from infrastructure.database.base import Base
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
 
 
 class UserStatus(enum.Enum):
