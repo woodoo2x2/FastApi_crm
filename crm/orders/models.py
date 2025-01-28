@@ -11,6 +11,7 @@ class DeliveryMethod(enum.Enum):
     COURIER = "COURIER"
     SELFPICKUP = "SELFPICKUP"
 
+
 class OrderStatus(enum.Enum):
     CREATED = "CREATED"
     IN_PROGRESS = "IN_PROGRESS"
@@ -19,6 +20,8 @@ class OrderStatus(enum.Enum):
 
     def __str__(self):
         return self.value
+
+
 class Order(Base):
     __tablename__ = "orders"
 

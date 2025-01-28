@@ -14,7 +14,7 @@ try:
         MAIL_SERVER=settings.MAIL_SERVER,
         MAIL_SSL_TLS=settings.MAIL_SSL_TLS,
         USE_CREDENTIALS=settings.MAIL_USE_CREDENTIALS,
-        MAIL_STARTTLS =settings.MAIL_USE_TLS
+        MAIL_STARTTLS=settings.MAIL_USE_TLS
     )
 
 except Exception as e:

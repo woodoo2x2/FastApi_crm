@@ -32,6 +32,7 @@ class UserUpdateSchema(BaseModel):
 class ResetPasswordRequest(BaseModel):
     password: str
 
+
 class UserStatusChangeSchema(BaseModel):
     user_id: int
     status: str

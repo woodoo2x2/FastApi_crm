@@ -39,5 +39,3 @@ async def block_user(request: Request,
     admin_service.check_admin_privileges(request)
     data = await admin_logic.change_user_status(data.user_id, data.status)
     return data
-
-

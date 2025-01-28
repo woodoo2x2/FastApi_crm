@@ -5,9 +5,9 @@ from typing import Sequence
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from exceptions import OrderNotFoundException
 from crm.orders.models import Order
 from crm.orders.schemas import OrderCreateSchema
+from exceptions import OrderNotFoundException
 
 
 @dataclass
@@ -55,5 +55,3 @@ class OrderLogic:
                 user = await session.scalar(select(Order).where(Order.id == order_id))
                 await session.delete(user)
                 await session.commit()
-
-

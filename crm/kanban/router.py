@@ -1,16 +1,16 @@
 import json
 from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException
-from starlette import status
+from fastapi import APIRouter, Depends
 from starlette.websockets import WebSocketDisconnect, WebSocket
 
-from dependency import get_orders_logic, get_request_user_id
-from exceptions import OrderNotFoundException
 from crm.orders.logic import OrderLogic
 from crm.orders.schemas import OrderCreateSchema
+from dependency import get_orders_logic
+from exceptions import OrderNotFoundException
 
 router = APIRouter(prefix='/kanban', tags=['kanban'])
+
 
 class WebSocketManager:
     def __init__(self):
@@ -29,6 +29,7 @@ class WebSocketManager:
 
 
 manager = WebSocketManager()
+
 
 @router.websocket("/ws/orders")
 async def websocket_orders_endpoint(websocket: WebSocket,

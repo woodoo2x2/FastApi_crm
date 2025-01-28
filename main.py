@@ -1,9 +1,6 @@
-from typing import List
-
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
-from starlette.websockets import WebSocket, WebSocketDisconnect
 
 from admin.router import router as admin_router
 from crm.clients.router import router as client_router
@@ -22,7 +19,6 @@ app.add_middleware(
     secret_key=settings.SESSION_SECRET_KEY,
     session_cookie="session",
 )
-
 
 app.add_middleware(
     CORSMiddleware,

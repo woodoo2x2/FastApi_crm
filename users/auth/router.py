@@ -101,3 +101,4 @@ async def logout(request: Request):
         return JSONResponse(
             {"message": "No active session found"}, status_code=400
         )
+
