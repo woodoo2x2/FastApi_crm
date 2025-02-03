@@ -1,12 +1,9 @@
 import enum
 from datetime import datetime
 
-
 from sqlalchemy import Column, Integer, String, Boolean, DateTime, Enum
 
 from infrastructure.database.base import Base
-
-
 
 
 class UserStatus(enum.Enum):
@@ -16,6 +13,8 @@ class UserStatus(enum.Enum):
 
     def __str__(self):
         return self.value
+
+
 class User(Base):
     __tablename__ = "users"
 
